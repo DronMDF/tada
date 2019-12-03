@@ -10,4 +10,4 @@ jobs:
       uses: actions/checkout@v1
     - uses: ./ # Uses an action in the root directory
     - name: Tada action step
-      uses: DronMDF/tada
+      uses: DronMDF/tada@HEAD
