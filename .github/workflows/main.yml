@@ -1,0 +1,14 @@
+on: [push]
+
+jobs:
+  tada_job:
+    runs-on: ubuntu-latest
+    name: A tada job
+    steps:
+    # To use this repository's private action, you must check out the repository
+    - name: Checkout
+      uses: actions/checkout@v1
+    - uses: ./ # Uses an action in the root directory
+    - name: Tada action step
+      id: tada
+      uses: actions/tada@v1
