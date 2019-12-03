@@ -1,3 +1,3 @@
 #!/bin/sh -l
 
-la -la ${GITHUB_WORKSPACE}
+ls -la ${GITHUB_WORKSPACE}
