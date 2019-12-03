@@ -1,3 +1,3 @@
 #!/bin/sh -l
 
-echo Tada success
+la -la ${GITHUB_WORKSPACE}
