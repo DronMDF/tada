@@ -1,3 +1,4 @@
-FROM alpine:3.10
-COPY entrypoint.sh /entrypoint.sh
-ENTRYPOINT ["/entrypoint.sh"]
+FROM python:3
+RUN pip install --no-cache-dir pygithub
+COPY tada.py /tada.py
+ENTRYPOINT ["python" "/tada.py"]
