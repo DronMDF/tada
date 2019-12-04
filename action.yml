@@ -1,5 +1,10 @@
 name: 'Tada'
 description: 'Tada action'
+inputs:
+  githubToken:
+    required: true
 runs:
   using: 'docker'
   image: 'Dockerfile'
+  env:
+    GITHUB_TOKEN: @{{ input.githubToken }}

@@ -25,3 +25,5 @@ for p in sys.argv[1:]:
 
 for t in todos:
 	print(t)
+
+print('GITHUB_TOKEN', os.environ.get('GITHUB_TOKEN', 'None'))
