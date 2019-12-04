@@ -3,6 +3,7 @@
 import os
 import re
 import sys
+from github import Github
 
 # @todo Check all todos in repository issues
 # @todo Create new issues
@@ -26,4 +27,10 @@ for p in sys.argv[1:]:
 for t in todos:
 	print(t)
 
-print('GITHUB_TOKEN', os.environ.get('GITHUB_TOKEN', 'None'))
+if 'GITHUB_TOKEN' not in os.environ:
+	raise RuntimeError("No token")
+
+gh = Github(os.environ['GITHUB_TOKEN'])
+repo = gh.get_repo(os.environ['GITHUB_REPOSITORY'])
+for i in repo.get_issues(state='open'):
+	print(i)
