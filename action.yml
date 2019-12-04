@@ -1,10 +1,11 @@
 name: 'Tada'
 description: 'Tada action'
 inputs:
-  githubToken:
-    required: true
+  token:
+    description: 'Access token for manage issue'
+    default: ${{ github.token }}
 runs:
   using: 'docker'
   image: 'Dockerfile'
   env:
-    GITHUB_TOKEN: @{{ input.githubToken }}
+    GITHUB_TOKEN: @{{ inputs.token }}
