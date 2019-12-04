@@ -11,4 +11,4 @@ jobs:
     - name: Tada action step
       uses: ./
       with:
-        githubToken: ${{ secret.GITHUB_TOKEN }}
+        githubToken: ${{ secrets.GITHUB_TOKEN }}
