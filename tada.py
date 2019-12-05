@@ -69,4 +69,4 @@ for t in todos:
 	for i in issues:
 		if th in i.body:
 			print(t)
-			print("Issue:", i.id)
+			print("Issue:", i.id, i.number)
