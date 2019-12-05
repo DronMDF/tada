@@ -72,7 +72,11 @@ for t in todos:
 			print("Issue:", i.id, i.number)
 			break
 	else:
-		body = '\n'.join(
+		print('New issue')
+		print(t)
+		print(t.hash())
+
+		body = '\n'.join((
 			'',
 			*t.todo,
 			'',
@@ -80,5 +84,5 @@ for t in todos:
 			'It will be closed after remove @todo lines from code.',
 			'',
 			'todo-hash: %s' % t.hash()
-		)
+		))
 		repo.create_issue(t.brief, body, labels=['todo'])
