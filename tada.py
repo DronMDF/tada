@@ -70,3 +70,15 @@ for t in todos:
 		if th in i.body:
 			print(t)
 			print("Issue:", i.id, i.number)
+			break
+	else:
+		body = '\n'.join(
+			'',
+			*t.todo,
+			'',
+			'This issue created automatically.',
+			'It will be closed after remove @todo lines from code.',
+			'',
+			'todo-hash: %s' % t.hash()
+		)
+		repo.create_issue(t.brief, body, labels=['todo'])
