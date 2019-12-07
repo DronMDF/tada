@@ -74,7 +74,7 @@ for h, i in imap.items():
 		i.create_comment('Marker removed from code, issue is closed now.')
 		i.edit(state='closed')
 
-for h, t in tmap:
+for h, t in tmap.items():
 	if h not in imap:
 		print("Create issue, marker %s discovered in code" % h)
 		# @todo Paste marked fragment of code as verbatim block
