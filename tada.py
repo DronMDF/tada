@@ -70,13 +70,13 @@ tmap = dict((t.hash(), t) for t in todos)
 
 for h, i in imap.items():
 	if h not in tmap:
-		printf("Close issue #%d, marker %s removed from code" % (i.number, h))
+		print("Close issue #%d, marker %s removed from code" % (i.number, h))
 		i.create_comment('Marker removed from code, issue is closed now.')
 		i.edit(state='closed')
 
 for h, t in tmap:
 	if h not in imap:
-		printf("Create issue, marker %s discovered in code" % h)
+		print("Create issue, marker %s discovered in code" % h)
 		# @todo Paste marked fragment of code as verbatim block
 		body = '\n'.join((
 			'',
