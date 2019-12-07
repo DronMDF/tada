@@ -7,10 +7,6 @@ import re
 import sys
 from github import Github
 
-# @todo Check all todos in repository issues
-# @todo Create new issues
-# @todo Remove closed issues
-
 class Todo:
 	def __init__(self, file, nl):
 		# @todo Init todo with args
@@ -70,7 +66,7 @@ def ipair(repo):
 			yield m.group(1), m
 
 imap = dict(ipair(repo))
-tmap = {t.hash(), t for t in todos}
+tmap = dict((t.hash(), t) for t in todos)
 
 for h, i in imap.items():
 	if h not in tmap:
