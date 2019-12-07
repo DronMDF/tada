@@ -1,14 +1,14 @@
 on:
   push:
-    branches:
+    branches-ignore:
       - master
 
+# @todo Check python syntax
+# @todo Check TODO syntax
 jobs:
-  todo:
+  check:
     runs-on: ubuntu-latest
-    name: TODO issue control
+    name: Check style
     steps:
       - name: Checkout
         uses: actions/checkout@v1
-      - name: TODO processing
-        uses: ./
