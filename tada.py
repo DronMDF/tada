@@ -62,20 +62,26 @@ if 'GITHUB_TOKEN' not in os.environ:
 
 gh = Github(os.environ['GITHUB_TOKEN'])
 repo = gh.get_repo(os.environ['GITHUB_REPOSITORY'])
-issues = repo.get_issues(state='open')
 
-for t in todos:
-	th = t.hash()
-	for i in issues:
-		if th in i.body:
-			print(t)
-			print("Issue:", i.id, i.number)
-			break
-	else:
-		print('New issue')
-		print(t)
-		print(t.hash())
+def ipair(repo):
+	for i in repo.get_issues(state='open'):
+		m = re.search(r'todo-hash:\s+([\da-fA-F]+)', i.body)
+		if m:
+			yield m.group(1), m
 
+imap = dict(ipair(repo))
+tmap = {t.hash(), t for t in todos}
+
+for h, i in imap.items():
+	if h not in tmap:
+		printf("Close issue #%d, marker %s removed from code" % (i.number, h))
+		i.create_comment('Marker removed from code, issue is closed now.')
+		i.edit(state='closed')
+
+for h, t in tmap:
+	if h not in imap:
+		printf("Create issue, marker %s discovered in code" % h)
+		# @todo Paste marked fragment of code as verbatim block
 		body = '\n'.join((
 			'',
 			*t.todo,
@@ -83,6 +89,6 @@ for t in todos:
 			'This issue created automatically.',
 			'It will be closed after remove @todo lines from code.',
 			'',
-			'todo-hash: %s' % t.hash()
+			'todo-hash: %s' % h
 		))
 		repo.create_issue(t.brief, body, labels=['todo'])

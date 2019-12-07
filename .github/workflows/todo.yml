@@ -1,0 +1,14 @@
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  tada_job:
+    runs-on: ubuntu-latest
+    name: TODO issue control
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Tada action step
+        uses: ./
