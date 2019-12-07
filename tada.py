@@ -63,7 +63,7 @@ def ipair(repo):
 	for i in repo.get_issues(state='open'):
 		m = re.search(r'todo-hash:\s+([\da-fA-F]+)', i.body)
 		if m:
-			yield m.group(1), m
+			yield m.group(1), i
 
 imap = dict(ipair(repo))
 tmap = dict((t.hash(), t) for t in todos)
