@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - uses: actions/setup-python@v1
-      - run: pip install pycodestyle pylint
+      - run: pip install pycodestyle pylint pygithub
       - name: Check style
         run: |
           pycodestyle --ignore=W191,E117 .
