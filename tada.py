@@ -83,7 +83,7 @@ for h, t in tmap.items():
 			*t.todo,
 			'',
 			'This issue created automatically.',
-			'It will be closed after remove @todo lines from code.',
+			'It will be closed after remove marker from code.',
 			'',
 			'todo-hash: %s' % h
 		))
