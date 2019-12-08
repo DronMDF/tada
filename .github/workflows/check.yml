@@ -3,16 +3,16 @@ on:
     branches-ignore:
       - master
 
-# @todo #9 Check python syntax with flakes8
+# @todo #15 Check python syntax with flakes8
 # @todo Check TODO syntax
 jobs:
   check:
     runs-on: ubuntu-latest
-    name: Check style
     steps:
       - uses: actions/checkout@v1
       - uses: actions/setup-python@v1
       - run: pip install pycodestyle pylint
-      - run: |
+      - name: Check style
+        run: |
           pycodestyle --ignore=W191,E117 .
-          pylint *.py
+          pylint --disable=W0312,W0621,C0330 *.py

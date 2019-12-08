@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+'''
+TODO control action module
+'''
 
 import itertools
 import hashlib
@@ -9,7 +12,12 @@ from github import Github
 
 
 class Todo:
+	'''
+	TODO class
+	'''
+
 	def __init__(self, file, nl):
+		''' Constructor '''
 		# @todo Init todo with args
 		#  and test for multiline comment
 		self.file = file
@@ -18,17 +26,22 @@ class Todo:
 		self.begin = nl[0][0]
 		self.end = self.begin + len(self.todo)
 
-	def firstline(self, l):
-		tm = re.match(r'^(.*)\s+@todo\s+(.*)$', l)
-		return tm.group(1), tm.group(2)
+	@staticmethod
+	def firstline(line):
+		''' Method detect first line format '''
+		match = re.match(r'^(.*)\s+@todo\s+(.*)$', line)
+		return match.group(1), match.group(2)
 
-	def lastlines(self, ls, pfx):
+	@staticmethod
+	def lastlines(lines, prefix):
+		''' Method fetch continuation lines of todo '''
 		return [
-			l[len(pfx):]
-			for l in itertools.takewhile(lambda l: l.startswith(pfx), ls)
+			l[len(prefix):]
+			for l in itertools.takewhile(lambda l: l.startswith(prefix), lines)
 		]
 
 	def __str__(self):
+		''' String todo representation '''
 		return '\n'.join((
 			"%s[%u:%u]" % (self.file, self.begin, self.end),
 			self.brief,
@@ -36,63 +49,68 @@ class Todo:
 		))
 
 	def hash(self):
+		''' todo hash value '''
 		return hashlib.sha1(
 			' '.join((self.brief, *self.todo)).encode('utf8')
 		).hexdigest()
 
 
-def readTodo(file):
-	with open(file, 'r', encoding='utf8') as f:
-		content = f.read().split('\n')
+def read_todo(file):
+	''' Read todo's from file '''
+	with open(file, 'r', encoding='utf8') as fio:
+		content = fio.read().split('\n')
 		nlt = [(n, l, re.search(r'\s+@todo\s+', l)) for n, l in enumerate(content)]
-		for n in (n for n, _, t in nlt if t):
-			tnl = itertools.takewhile(lambda nlti: nlti[0] == n or not nlti[2], nlt[n:])
+		for lineno in (n for n, _, t in nlt if t):
+			tnl = itertools.takewhile(lambda nlti, ln=lineno: nlti[0] == ln or not nlti[2], nlt[lineno:])
 			yield Todo(file, list(tnl))
 
 
 def ipair(repo):
-	for i in repo.get_issues(state='open'):
-		m = re.search(r'todo-hash:\s+([\da-fA-F]+)', i.body)
-		if m:
-			yield m.group(1), i
+	''' Create key/value list of issues. Key is a todo hash '''
+	for issue in repo.get_issues(state='open'):
+		match = re.search(r'todo-hash:\s+([\da-fA-F]+)', issue.body)
+		if match:
+			yield match.group(1), issue
 
 
-todos = []
+TODOS = []
 
-for p in sys.argv[1:]:
-	for root, dir, files in os.walk(p, topdown=True):
-		if '.git' in dir:
-			dir.remove('.git')
+for path in sys.argv[1:]:
+	for root, dirs, files in os.walk(path, topdown=True):
+		if '.git' in dirs:
+			dirs.remove('.git')
 		for f in files:
-			todos.extend(readTodo(os.path.join(root, f)))
+			TODOS.extend(read_todo(os.path.join(root, f)))
 
 if 'GITHUB_TOKEN' not in os.environ:
 	raise RuntimeError("No token")
 
-gh = Github(os.environ['GITHUB_TOKEN'])
-repo = gh.get_repo(os.environ['GITHUB_REPOSITORY'])
+# @todo #15 Global variable in tada.py
+#  Global variable is evil. Need to incapsulate them.
+GH = Github(os.environ['GITHUB_TOKEN'])
+REPO = GH.get_repo(os.environ['GITHUB_REPOSITORY'])
 
 
-imap = dict(ipair(repo))
-tmap = dict((t.hash(), t) for t in todos)
+IMAP = dict(ipair(REPO))
+TMAP = dict((t.hash(), t) for t in TODOS)
 
-for h, i in imap.items():
-	if h not in tmap:
-		print("Close issue #%d, marker %s removed from code" % (i.number, h))
-		i.create_comment('Marker removed from code, issue is closed now.')
-		i.edit(state='closed')
+for todoid, issue in IMAP.items():
+	if todoid not in IMAP:
+		print("Close issue #%d, marker %s removed from code" % (issue.number, todoid))
+		issue.create_comment('Marker removed from code, issue is closed now.')
+		issue.edit(state='closed')
 
-for h, t in tmap.items():
-	if h not in imap:
-		print("Create issue, marker %s discovered in code" % h)
+for todoid, todo in TMAP.items():
+	if todoid not in TMAP:
+		print("Create issue, marker %s discovered in code" % todoid)
 		# @todo Paste marked fragment of code as verbatim block
 		body = '\n'.join((
 			'',
-			*t.todo,
+			*todo.todo,
 			'',
 			'This issue created automatically.',
 			'It will be closed after remove marker from code.',
 			'',
-			'todo-hash: %s' % h
+			'todo-hash: %s' % todoid
 		))
-		repo.create_issue(t.brief, body, labels=['todo'])
+		REPO.create_issue(todo.brief, body, labels=['todo'])
