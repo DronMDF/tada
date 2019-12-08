@@ -61,7 +61,10 @@ def read_todo(file):
 		content = fio.read().split('\n')
 		nlt = [(n, l, re.search(r'\s+@todo\s+', l)) for n, l in enumerate(content)]
 		for lineno in (n for n, _, t in nlt if t):
-			tnl = itertools.takewhile(lambda nlti, ln=lineno: nlti[0] == ln or not nlti[2], nlt[lineno:])
+			tnl = itertools.takewhile(
+				lambda nlti, ln=lineno: nlti[0] == ln or not nlti[2],
+				nlt[lineno:]
+			)
 			yield Todo(file, list(tnl))
 
 
@@ -96,7 +99,10 @@ TMAP = dict((t.hash(), t) for t in TODOS)
 
 for todoid, issue in IMAP.items():
 	if todoid not in IMAP:
-		print("Close issue #%d, marker %s removed from code" % (issue.number, todoid))
+		print("Close issue #%d, marker %s removed from code" % (
+			issue.number,
+			todoid
+		))
 		issue.create_comment('Marker removed from code, issue is closed now.')
 		issue.edit(state='closed')
 
