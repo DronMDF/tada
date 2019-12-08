@@ -3,7 +3,7 @@ on:
     branches-ignore:
       - master
 
-# @todo #9 Check python syntax with pylint
+# @todo #15 Check python syntax with flakes8
 # @todo Check TODO syntax
 jobs:
   check:
@@ -12,5 +12,6 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - uses: actions/setup-python@v1
-      - run: pip install pycodestyle
+      - run: pip install pycodestyle pylint pygithub
       - run: pycodestyle --ignore=W191,E117 .
+      - run: pylint --disable=W0312,W0621,C0330 *.py
