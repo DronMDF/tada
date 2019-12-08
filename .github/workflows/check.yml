@@ -3,12 +3,14 @@ on:
     branches-ignore:
       - master
 
-# @todo Check python syntax
+# @todo #9 Check python syntax with pylint
 # @todo Check TODO syntax
 jobs:
   check:
     runs-on: ubuntu-latest
     name: Check style
     steps:
-      - name: Checkout
-        uses: actions/checkout@v1
+      - uses: actions/checkout@v1
+      - uses: actions/setup-python@v1
+      - run: pip install pycodestyle
+      - run: pycodestyle --ignore=W191,E117 .
