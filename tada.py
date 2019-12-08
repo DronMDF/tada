@@ -97,8 +97,10 @@ REPO = GH.get_repo(os.environ['GITHUB_REPOSITORY'])
 IMAP = dict(ipair(REPO))
 TMAP = dict((t.hash(), t) for t in TODOS)
 
+# @todo #17 Test logic with creation/removing issue
+#  Under style work this is degraded
 for todoid, issue in IMAP.items():
-	if todoid not in IMAP:
+	if todoid not in TMAP:
 		print("Close issue #%d, marker %s removed from code" % (
 			issue.number,
 			todoid
@@ -107,7 +109,7 @@ for todoid, issue in IMAP.items():
 		issue.edit(state='closed')
 
 for todoid, todo in TMAP.items():
-	if todoid not in TMAP:
+	if todoid not in IMAP:
 		print("Create issue, marker %s discovered in code" % todoid)
 		# @todo Paste marked fragment of code as verbatim block
 		body = '\n'.join((
