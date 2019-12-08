@@ -12,6 +12,5 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - uses: actions/setup-python@v1
-      - run: |
-        pip install pycodestyle
-        pycodestyle --ignore=W191,E117 .
+      - run: pip install pycodestyle
+      - run: pycodestyle --ignore=W191,E117 .
