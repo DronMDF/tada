@@ -7,6 +7,7 @@ import re
 import sys
 from github import Github
 
+
 class Todo:
 	def __init__(self, file, nl):
 		# @todo Init todo with args
@@ -22,7 +23,10 @@ class Todo:
 		return tm.group(1), tm.group(2)
 
 	def lastlines(self, ls, pfx):
-		return [l[len(pfx):] for l in itertools.takewhile(lambda l: l.startswith(pfx), ls)]
+		return [
+			l[len(pfx):]
+			for l in itertools.takewhile(lambda l: l.startswith(pfx), ls)
+		]
 
 	def __str__(self):
 		return '\n'.join((
@@ -32,7 +36,9 @@ class Todo:
 		))
 
 	def hash(self):
-		return hashlib.sha1(' '.join((self.brief, *self.todo)).encode('utf8')).hexdigest()
+		return hashlib.sha1(
+			' '.join((self.brief, *self.todo)).encode('utf8')
+		).hexdigest()
 
 
 def readTodo(file):
@@ -42,6 +48,13 @@ def readTodo(file):
 		for n in (n for n, _, t in nlt if t):
 			tnl = itertools.takewhile(lambda nlti: nlti[0] == n or not nlti[2], nlt[n:])
 			yield Todo(file, list(tnl))
+
+
+def ipair(repo):
+	for i in repo.get_issues(state='open'):
+		m = re.search(r'todo-hash:\s+([\da-fA-F]+)', i.body)
+		if m:
+			yield m.group(1), i
 
 
 todos = []
@@ -59,11 +72,6 @@ if 'GITHUB_TOKEN' not in os.environ:
 gh = Github(os.environ['GITHUB_TOKEN'])
 repo = gh.get_repo(os.environ['GITHUB_REPOSITORY'])
 
-def ipair(repo):
-	for i in repo.get_issues(state='open'):
-		m = re.search(r'todo-hash:\s+([\da-fA-F]+)', i.body)
-		if m:
-			yield m.group(1), i
 
 imap = dict(ipair(repo))
 tmap = dict((t.hash(), t) for t in todos)
