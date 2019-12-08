@@ -76,49 +76,51 @@ def ipair(repo):
 			yield match.group(1), issue
 
 
-TODOS = []
+def main(*argv):
+	todos = []
 
-for path in sys.argv[1:]:
-	for root, dirs, files in os.walk(path, topdown=True):
-		if '.git' in dirs:
-			dirs.remove('.git')
-		for f in files:
-			TODOS.extend(read_todo(os.path.join(root, f)))
+	for path in argv:
+		for root, dirs, files in os.walk(path, topdown=True):
+			if '.git' in dirs:
+				dirs.remove('.git')
+			for f in files:
+				todos.extend(read_todo(os.path.join(root, f)))
 
-if 'GITHUB_TOKEN' not in os.environ:
-	raise RuntimeError("No token")
+	if 'GITHUB_TOKEN' not in os.environ:
+		raise RuntimeError("No token")
 
-# @todo #15 Global variable in tada.py
-#  Global variable is evil. Need to incapsulate them.
-GH = Github(os.environ['GITHUB_TOKEN'])
-REPO = GH.get_repo(os.environ['GITHUB_REPOSITORY'])
+	gh = Github(os.environ['GITHUB_TOKEN'])
+	repo = gh.get_repo(os.environ['GITHUB_REPOSITORY'])
+
+	imap = dict(ipair(repo))
+	tmap = dict((t.hash(), t) for t in todos)
+
+	# @todo #17 Test logic with creation/removing issue
+	#  Under style work this is degraded
+	for todoid, issue in imap.items():
+		if todoid not in tmap:
+			print("Close issue #%d, marker %s removed from code" % (
+				issue.number,
+				todoid
+			))
+			issue.create_comment('Marker removed from code, issue is closed now.')
+			issue.edit(state='closed')
+
+	for todoid, todo in tmap.items():
+		if todoid not in imap:
+			print("Create issue, marker %s discovered in code" % todoid)
+			# @todo Paste marked fragment of code as verbatim block
+			body = '\n'.join((
+				'',
+				*todo.todo,
+				'',
+				'This issue created automatically.',
+				'It will be closed after remove marker from code.',
+				'',
+				'todo-hash: %s' % todoid
+			))
+			repo.create_issue(todo.brief, body, labels=['todo'])
 
 
-IMAP = dict(ipair(REPO))
-TMAP = dict((t.hash(), t) for t in TODOS)
-
-# @todo #17 Test logic with creation/removing issue
-#  Under style work this is degraded
-for todoid, issue in IMAP.items():
-	if todoid not in TMAP:
-		print("Close issue #%d, marker %s removed from code" % (
-			issue.number,
-			todoid
-		))
-		issue.create_comment('Marker removed from code, issue is closed now.')
-		issue.edit(state='closed')
-
-for todoid, todo in TMAP.items():
-	if todoid not in IMAP:
-		print("Create issue, marker %s discovered in code" % todoid)
-		# @todo Paste marked fragment of code as verbatim block
-		body = '\n'.join((
-			'',
-			*todo.todo,
-			'',
-			'This issue created automatically.',
-			'It will be closed after remove marker from code.',
-			'',
-			'todo-hash: %s' % todoid
-		))
-		REPO.create_issue(todo.brief, body, labels=['todo'])
+if __name__ == "__main__":
+	main(sys.argv[1:])
