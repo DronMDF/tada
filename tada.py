@@ -77,20 +77,21 @@ def ipair(repo):
 
 
 def main(*argv):
+	''' main method '''
 	todos = []
 
 	for path in argv:
 		for root, dirs, files in os.walk(path, topdown=True):
 			if '.git' in dirs:
 				dirs.remove('.git')
-			for f in files:
-				todos.extend(read_todo(os.path.join(root, f)))
+			for file in files:
+				todos.extend(read_todo(os.path.join(root, file)))
 
 	if 'GITHUB_TOKEN' not in os.environ:
 		raise RuntimeError("No token")
 
-	gh = Github(os.environ['GITHUB_TOKEN'])
-	repo = gh.get_repo(os.environ['GITHUB_REPOSITORY'])
+	github = Github(os.environ['GITHUB_TOKEN'])
+	repo = github.get_repo(os.environ['GITHUB_REPOSITORY'])
 
 	imap = dict(ipair(repo))
 	tmap = dict((t.hash(), t) for t in todos)
@@ -123,4 +124,4 @@ def main(*argv):
 
 
 if __name__ == "__main__":
-	main(sys.argv[1:])
+	main(*sys.argv[1:])
