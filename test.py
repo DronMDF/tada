@@ -26,7 +26,7 @@ class TodoTest(unittest.TestCase):
 		)
 		self.assertListEqual(
 			todo.lines(),
-			[ '# @todo first', '# next' ]
+			['# @todo first', '# next']
 		)
 
 

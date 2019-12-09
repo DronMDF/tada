@@ -111,9 +111,9 @@ def main(*argv):
 			print("Create issue, marker %s discovered in code" % todoid)
 			body = '\n'.join((
 				'',
-				'```'
+				'```',
 				*todo.lines,
-				'```'
+				'```',
 				'',
 				'This issue created automatically.',
 				'It will be closed after remove marker from code.',
