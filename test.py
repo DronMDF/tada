@@ -4,7 +4,7 @@ Tada unittest module
 '''
 
 import unittest
-from tada import Todo
+from tada import Todo, Todos
 
 
 class TodoTest(unittest.TestCase):
@@ -32,6 +32,47 @@ class TodoTest(unittest.TestCase):
 		self.assertListEqual(
 			todo.lines(),
 			['# @todo first', '# next']
+		)
+
+
+class TestRepo():
+	''' Test github repository '''
+	def __init__(self):
+		self.issues = []
+		self.title = None
+		self.body = None
+		self.labels = None
+
+	def get_issues(self, state):
+		''' Get issues list '''
+		return [i for i in self.issues if i.state == state]
+
+	def create_issue(self, title, body, labels):
+		''' Create issue '''
+		self.title = title
+		self.body = body
+		self.labels = labels
+
+
+class TodosTest(unittest.TestCase):
+	''' Test for todo list '''
+	def test_create_new(self):
+		''' New todo should be translated into issue '''
+		todo = Todo(
+			'test.py',
+			[(1, '... @todo first', True), (3, '... next', False)]
+		)
+		todos = Todos([todo])
+		repo = TestRepo()
+		todos.create_new(dict(), repo)
+		self.assertIn(
+			'\n'.join((
+				'```',
+				'# @todo first',
+				'# next',
+				'```'
+			)),
+			repo.body
 		)
 
 
