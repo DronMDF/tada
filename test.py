@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+'''
+Tada unittest module
+'''
 
 import unittest
 from tada import Todo
