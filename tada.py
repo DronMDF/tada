@@ -55,6 +55,33 @@ class Todo:
 		).hexdigest()
 
 
+class Todos:
+	''' TODO list class '''
+	def __init__(self, todos):
+		self.tmap = dict((t.hash(), t) for t in todos)
+
+	def create_new(self, imap, repo):
+		''' Create new issue for all new todo '''
+		for todoid, todo in self.tmap.items():
+			if todoid not in imap:
+				body = '\n'.join((
+					'',
+					'```',
+					*todo.lines(),
+					'```',
+					'',
+					'This issue created automatically.',
+					'It will be closed after remove marker from code.',
+					'',
+					'todo-hash: %s' % todoid
+				))
+				repo.create_issue(todo.brief, body, labels=['todo'])
+
+	def has(self, todoid):
+		''' Check todo id '''
+		return todoid in self.tmap
+
+
 def read_todo(file):
 	''' Read todo's from file '''
 	with open(file, 'r', encoding='utf8') as fio:
@@ -94,12 +121,12 @@ def main(*argv):
 	repo = github.get_repo(os.environ['GITHUB_REPOSITORY'])
 
 	imap = dict(ipair(repo))
-	tmap = dict((t.hash(), t) for t in todos)
+	tmap = Todos(todos)
 
 	# @todo #17 Test logic with creation/removing issue
 	#  Under style work this is degraded
 	for todoid, issue in imap.items():
-		if todoid not in tmap:
+		if not tmap.has(todoid):
 			print("Close issue #%d, marker %s removed from code" % (
 				issue.number,
 				todoid
@@ -107,21 +134,7 @@ def main(*argv):
 			issue.create_comment('Marker removed from code, issue is closed now.')
 			issue.edit(state='closed')
 
-	for todoid, todo in tmap.items():
-		if todoid not in imap:
-			print("Create issue, marker %s discovered in code" % todoid)
-			body = '\n'.join((
-				'',
-				'```',
-				*todo.lines,
-				'```',
-				'',
-				'This issue created automatically.',
-				'It will be closed after remove marker from code.',
-				'',
-				'todo-hash: %s' % todoid
-			))
-			repo.create_issue(todo.brief, body, labels=['todo'])
+	tmap.create_new(imap, repo)
 
 
 if __name__ == "__main__":
