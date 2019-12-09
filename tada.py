@@ -40,13 +40,12 @@ class Todo:
 			for l in itertools.takewhile(lambda l: l.startswith(prefix), lines)
 		]
 
-	def __str__(self):
-		''' String todo representation '''
-		return '\n'.join((
-			"%s[%u:%u]" % (self.file, self.begin, self.end),
-			self.brief,
-			*self.todo
-		))
+	def lines(self):
+		# @todo #8 lines return fakes, need to keep original lines
+		return [
+			'# @todo ' + self.brief,
+			*('#' + t for t in self.todo)
+		]
 
 	def hash(self):
 		''' todo hash value '''
@@ -110,10 +109,11 @@ def main(*argv):
 	for todoid, todo in tmap.items():
 		if todoid not in imap:
 			print("Create issue, marker %s discovered in code" % todoid)
-			# @todo Paste marked fragment of code as verbatim block
 			body = '\n'.join((
 				'',
-				*todo.todo,
+				'```'
+				*todo.lines,
+				'```'
 				'',
 				'This issue created automatically.',
 				'It will be closed after remove marker from code.',
