@@ -8,7 +8,8 @@ class TodoTest(unittest.TestCase):
 	''' tests for Todo class '''
 
 	# @todo #8 Remove extra space from hashed todo message
-	def testPersistantHashValue(self):
+	def test_persistant_hash_value(self):
+		''' Hash value should be equals, if todo words is persistent '''
 		todo1 = Todo(
 			'test.py',
 			[(10, '... @todo first', True), (11, '... next', False)]
@@ -19,7 +20,8 @@ class TodoTest(unittest.TestCase):
 		)
 		self.assertEqual(todo1.hash(), todo2.hash())
 
-	def testOriginalTextBlock(self):
+	def test_original_text_block(self):
+		''' todo should return origin lines, for paste into new issue '''
 		todo = Todo(
 			'test.py',
 			[(10, '# @todo first', True), (11, '# next', False)]

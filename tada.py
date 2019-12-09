@@ -41,6 +41,7 @@ class Todo:
 		]
 
 	def lines(self):
+		''' Method return original todo lines '''
 		# @todo #8 lines return fakes, need to keep original lines
 		return [
 			'# @todo ' + self.brief,
