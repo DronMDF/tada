@@ -15,11 +15,13 @@ class TodoTest(unittest.TestCase):
 		''' Hash value should be equals, if todo words is persistent '''
 		todo1 = Todo(
 			'test.py',
-			[(10, '... @todo first', True), (11, '... next', False)]
+			[(10, '... @tada first', True), (11, '... next', False)],
+			marker='@tada'
 		)
 		todo2 = Todo(
 			'test2.py',
-			[(15, '... @todo first  next', True)]
+			[(15, '... @tada first  next', True)],
+			marker='@tada'
 		)
 		self.assertEqual(todo1.hash(), todo2.hash())
 
@@ -27,11 +29,12 @@ class TodoTest(unittest.TestCase):
 		''' todo should return origin lines, for paste into new issue '''
 		todo = Todo(
 			'test.py',
-			[(10, '# @todo first', True), (11, '# next', False)]
+			[(10, '# @tada first', True), (11, '# next', False)],
+			marker='@tada'
 		)
 		self.assertListEqual(
 			todo.lines(),
-			['# @todo first', '# next']
+			['# @tada first', '# next']
 		)
 
 
@@ -60,7 +63,8 @@ class TodosTest(unittest.TestCase):
 		''' New todo should be translated into issue '''
 		todo = Todo(
 			'test.py',
-			[(1, '... @todo first', True), (3, '... next', False)]
+			[(1, '... @tada first', True), (3, '... next', False)],
+			marker='@tada'
 		)
 		todos = Todos([todo])
 		repo = TestRepo()
@@ -68,7 +72,7 @@ class TodosTest(unittest.TestCase):
 		self.assertIn(
 			'\n'.join((
 				'```',
-				'# @todo first',
+				'# @tada first',
 				'# next',
 				'```'
 			)),

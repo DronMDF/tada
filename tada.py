@@ -16,20 +16,21 @@ class Todo:
 	TODO class
 	'''
 
-	def __init__(self, file, nl):
+	def __init__(self, file, nl, marker='@todo'):
 		''' Constructor '''
 		# @todo Init todo with args
 		#  and test for multiline comment
 		self.file = file
-		pfx, self.brief = self.firstline(nl[0][1])
+		self.marker = marker
+		pfx, self.brief = self.firstline(nl[0][1], marker)
 		self.todo = self.lastlines((l for _, l, _ in nl[1:]), pfx)
 		self.begin = nl[0][0]
 		self.end = self.begin + len(self.todo)
 
 	@staticmethod
-	def firstline(line):
+	def firstline(line, marker):
 		''' Method detect first line format '''
-		match = re.match(r'^(.*)\s+@todo\s+(.*)$', line)
+		match = re.match(r'^(.*)\s+%s\s+(.*)$' % marker, line)
 		return match.group(1), match.group(2)
 
 	@staticmethod
@@ -44,7 +45,7 @@ class Todo:
 		''' Method return original todo lines '''
 		# @todo #8 lines return fakes, need to keep original lines
 		return [
-			'# @todo ' + self.brief,
+			'# %s %s' % (self.marker, self.brief),
 			*('#' + t for t in self.todo)
 		]
 
