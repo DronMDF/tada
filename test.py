@@ -20,7 +20,7 @@ class TodoTest(unittest.TestCase):
 		)
 		todo2 = Todo(
 			'test2.py',
-			[(15, '... @tada first  next', True)],
+			[(15, '... @tada first next', True)],
 			marker='@tada'
 		)
 		self.assertEqual(todo1.hash(), todo2.hash())
@@ -35,6 +35,18 @@ class TodoTest(unittest.TestCase):
 		self.assertListEqual(
 			todo.lines(),
 			['# @tada first', '# next']
+		)
+
+	def test_original_text_block_with_strange_prefix(self):
+		''' todo should return origin lines, with prefix and spaces '''
+		todo = Todo(
+			'test.py',
+			[(10, '%%%%% @tada  first', True), (11, '%%%%%  next', False)],
+			marker='@tada'
+		)
+		self.assertListEqual(
+			todo.lines(),
+			['%%%%% @tada  first', '%%%%%  next']
 		)
 
 
@@ -72,8 +84,8 @@ class TodosTest(unittest.TestCase):
 		self.assertIn(
 			'\n'.join((
 				'```',
-				'# @tada first',
-				'# next',
+				'... @tada first',
+				'... next',
 				'```'
 			)),
 			repo.body

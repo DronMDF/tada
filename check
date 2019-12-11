@@ -1,0 +1,8 @@
+#!/bin/sh
+
+set -e
+set -v
+
+pycodestyle --ignore=W191,E117 .
+pylint --disable=W0312,W0621,C0330 *.py
+./test.py

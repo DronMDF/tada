@@ -22,37 +22,35 @@ class Todo:
 		#  and test for multiline comment
 		self.file = file
 		self.marker = marker
-		pfx, self.brief = self.firstline(nl[0][1], marker)
-		self.todo = self.lastlines((l for _, l, _ in nl[1:]), pfx)
+		self.prefix = self.get_prefix(nl[0][1], marker)
+		self.todo = list(itertools.takewhile(
+			lambda l: l.startswith(self.prefix),
+			(l[1] for l in nl)
+		))
 		self.begin = nl[0][0]
 		self.end = self.begin + len(self.todo)
 
 	@staticmethod
-	def firstline(line, marker):
-		''' Method detect first line format '''
-		match = re.match(r'^(.*)\s+%s\s+(.*)$' % marker, line)
-		return match.group(1), match.group(2)
+	def get_prefix(line, marker):
+		''' Method determine todo prefix '''
+		match = re.match(r'^(.*)\s+%s' % marker, line)
+		return match.group(1)
 
-	@staticmethod
-	def lastlines(lines, prefix):
-		''' Method fetch continuation lines of todo '''
-		return [
-			l[len(prefix):]
-			for l in itertools.takewhile(lambda l: l.startswith(prefix), lines)
-		]
+	def brief(self):
+		''' Method return issue title '''
+		return re.sub(r'%s\s+%s\s+' % (self.prefix, self.marker), '', self.todo[0])
 
 	def lines(self):
 		''' Method return original todo lines '''
-		# @todo #8 lines return fakes, need to keep original lines
-		return [
-			'# %s %s' % (self.marker, self.brief),
-			*('#' + t for t in self.todo)
-		]
+		return self.todo
 
 	def hash(self):
 		''' todo hash value '''
 		return hashlib.sha1(
-			' '.join((self.brief, *self.todo)).encode('utf8')
+			' '.join((
+				re.sub(r'%s\s+%s\s+' % (self.prefix, self.marker), '', self.todo[0]),
+				*(re.sub(r'%s\s+' % self.prefix, '', s) for s in self.todo[1:])
+			)).encode('utf8')
 		).hexdigest()
 
 
@@ -76,7 +74,7 @@ class Todos:
 					'',
 					'todo-hash: %s' % todoid
 				))
-				repo.create_issue(todo.brief, body, labels=['todo'])
+				repo.create_issue(todo.brief(), body, labels=['todo'])
 
 	def has(self, todoid):
 		''' Check todo id '''
