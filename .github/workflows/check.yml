@@ -11,5 +11,5 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - uses: actions/setup-python@v1
-      - run: pip install pycodestyle pylint pygithub pyflakes
+      - run: pip install pycodestyle pylint pygithub flake8
       - run: ./check
