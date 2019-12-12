@@ -16,8 +16,6 @@ class Todo:
 
 	def __init__(self, file, nl, marker='@todo'):
 		"""Constructor."""
-		# @todo Init todo with args
-		#  and test for multiline comment
 		self.file = file
 		self.marker = marker
 		self.prefix = self.get_prefix(nl[0][1], marker)
