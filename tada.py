@@ -76,7 +76,7 @@ class Todos:
 					'This issue created automatically.',
 					'It will be closed after remove marker from code.',
 					'',
-					'todo-hash: %s' % todoid
+					'todo-id: %s' % todoid
 				))
 				repo.create_issue(todo.brief(), body, labels=['todo'])
 
@@ -123,7 +123,7 @@ class File:
 def ipair(repo):
 	"""Create key/value list of issues. Key is a todo hash."""
 	for issue in repo.get_issues(state='open'):
-		match = re.search(r'todo-hash:\s+([\da-fA-F]+)', issue.body)
+		match = re.search(r'todo-id:\s+([\da-fA-F]+)', issue.body)
 		if match:
 			yield match.group(1), issue
 
@@ -137,7 +137,7 @@ def main(*argv):
 			if '.git' in dirs:
 				dirs.remove('.git')
 			for file in files:
-				todos.extend(File(os.path.join(root, file)).todos())
+				todos.extend(File(filename=os.path.join(root, file)).todos())
 
 	if 'GITHUB_TOKEN' not in os.environ:
 		raise RuntimeError('No token')
