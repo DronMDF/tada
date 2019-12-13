@@ -34,12 +34,12 @@ class Todo:
 	@staticmethod
 	def get_prefix(line, marker):
 		"""Method determine todo prefix."""
-		match = re.match(r'^(.*)%s' % marker, line)
+		match = re.match(r'^(.*)\s*%s' % marker, line)
 		return match.group(1)
 
 	def brief(self):
 		"""Method return issue title."""
-		return re.sub(r'%s\s+%s\s+' % (self.prefix, self.marker), '', self.todo[0])
+		return re.sub(r'^%s\s*%s\s+' % (self.prefix, self.marker), '', self.todo[0])
 
 	def lines(self):
 		"""Method return original todo lines."""
