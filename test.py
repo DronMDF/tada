@@ -49,6 +49,12 @@ class TodoTest(unittest.TestCase):
 			['%%%%% @tada  first', '%%%%%  next']
 		)
 
+	def test_todo_from_begin_line_hash(self):
+		self.assertEqual(
+			Todo('test', [(1, '@tada woho', True)], marker='@tada').hash(),
+			'2994f58e05ad62949210dabd2c585d8dc60a9435'
+		)
+
 
 class TestRepo():
 	"""Test github repository."""
