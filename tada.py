@@ -96,6 +96,7 @@ class File:
 			with open(self.filename, 'r', encoding='utf8') as fio:
 				self.lines = fio.read().split('\n')
 		else:
+			assert isinstance(lines, list), 'Invalid lines'
 			self.filename = 'unknown'
 			self.lines = lines
 
