@@ -30,7 +30,13 @@ class Todo:
 	def get_prefix(line, marker):
 		"""Method determine todo prefix."""
 		match = re.match(r'^(.*)\s+%s' % marker, line)
-		return match.group(1)
+		if match:
+			return match.group(1)
+		if not re.match(r'^%s' % marker, line):
+			raise RuntimeError('Wrong todo marker syntax')
+		# If todo at the begin of line.
+		#  prefix is one space, for detect end of todo
+		return ' '
 
 	def brief(self):
 		"""Method return issue title."""
@@ -79,20 +85,39 @@ class Todos:
 		return todoid in self.tmap
 
 
-def read_todo(file):
-	"""Read todo's from file."""
-	with open(file, 'r', encoding='utf8') as fio:
-		content = fio.read().split('\n')
+class File:
+	"""File parser."""
+
+	def __init__(self, lines=None, filename=None, marker='@todo'):
+		"""Constructor."""
+		self.marker = marker
+		if filename is not None:
+			self.filename = filename
+			with open(self.filename, 'r', encoding='utf8') as fio:
+				self.lines = fio.read().split('\n')
+		else:
+			self.filename = 'unknown'
+			self.lines = lines
+
+	def istodo(self, line):
+		"""Check for todo line."""
+		return any((
+			re.search(r'\s+%s\s+' % self.marker, line),
+			re.search(r'^%s\s+' % self.marker, line)
+		))
+
+	def todos(self):
+		"""List of all todo from file."""
 		nlt = [
-			(lineno, line, re.search(r'\s+@todo\s+', line))
-			for lineno, line in enumerate(content)
+			(lineno, line, self.istodo(line))
+			for lineno, line in enumerate(self.lines)
 		]
 		for lineno in (ln for ln, _, marked in nlt if marked):
 			tnl = itertools.takewhile(
 				lambda nlti, ln=lineno: nlti[0] == ln or not nlti[2],
 				nlt[lineno:]
 			)
-			yield Todo(file, list(tnl))
+			yield Todo(self.filename, list(tnl), marker=self.marker)
 
 
 def ipair(repo):
@@ -112,7 +137,7 @@ def main(*argv):
 			if '.git' in dirs:
 				dirs.remove('.git')
 			for file in files:
-				todos.extend(read_todo(os.path.join(root, file)))
+				todos.extend(File(os.path.join(root, file)).todos())
 
 	if 'GITHUB_TOKEN' not in os.environ:
 		raise RuntimeError('No token')
