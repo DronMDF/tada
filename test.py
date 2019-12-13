@@ -4,7 +4,7 @@
 """Tada unittest module."""
 
 import unittest
-from tada import Todo, Todos
+from tada import Todo, Todos, File
 
 
 class TodoTest(unittest.TestCase):
@@ -92,6 +92,17 @@ class TodosTest(unittest.TestCase):
 				'```'
 			)),
 			repo.body
+		)
+
+
+class FileTest(unittest.TestCase):
+	"""File parser test."""
+
+	def test_from_line_begin(self):
+		"""Marker at the begin of line."""
+		self.assertEqual(
+			len(list(File(['@tada from begin of line'], marker='@tada').todos())),
+			1
 		)
 
 
