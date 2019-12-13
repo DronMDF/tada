@@ -19,28 +19,27 @@ class Todo:
 		self.file = file
 		self.marker = marker
 		self.prefix = self.get_prefix(nl[0][1], marker)
-		self.todo = list(itertools.takewhile(
-			lambda line: line.startswith(self.prefix),
-			(line[1] for line in nl)
-		))
+		if self.prefix:
+			self.todo = list(itertools.takewhile(
+				lambda line: line.startswith(self.prefix),
+				(line[1] for line in nl)
+			))
+		else:
+			# If line start ftom marker - this is a plain text format
+			# todo is oneline always
+			self.todo = [nl[0][1]]
 		self.begin = nl[0][0]
 		self.end = self.begin + len(self.todo)
 
 	@staticmethod
 	def get_prefix(line, marker):
 		"""Method determine todo prefix."""
-		match = re.match(r'^(.*)\s+%s' % marker, line)
-		if match:
-			return match.group(1)
-		if not re.match(r'^%s' % marker, line):
-			raise RuntimeError('Wrong todo marker syntax')
-		# If todo at the begin of line.
-		#  prefix is one space, for detect end of todo
-		return ' '
+		match = re.match(r'^(.*)\s*%s' % marker, line)
+		return match.group(1)
 
 	def brief(self):
 		"""Method return issue title."""
-		return re.sub(r'%s\s+%s\s+' % (self.prefix, self.marker), '', self.todo[0])
+		return re.sub(r'^%s\s*%s\s+' % (self.prefix, self.marker), '', self.todo[0])
 
 	def lines(self):
 		"""Method return original todo lines."""
@@ -50,8 +49,8 @@ class Todo:
 		"""Todo hash value."""
 		return hashlib.sha1(
 			' '.join((
-				re.sub(r'%s\s+%s\s+' % (self.prefix, self.marker), '', self.todo[0]),
-				*(re.sub(r'%s\s+' % self.prefix, '', tline) for tline in self.todo[1:])
+				re.sub(r'^%s\s*%s\s+' % (self.prefix, self.marker), '', self.todo[0]),
+				*(re.sub(r'^%s\s*' % self.prefix, '', tline) for tline in self.todo[1:])
 			)).encode('utf8')
 		).hexdigest()
 

@@ -5,7 +5,7 @@ set -v
 
 pycodestyle --ignore=W191,E117 .
 
-pylint --disable=W0312,W0621,C0330 *.py
+pylint --disable=W0312,W0621,C0330,W0511 *.py
 
 # @todo #21 Enable WPS110 flake8 warning
 # @todo #21 Enable WPS210 flake8 warning
