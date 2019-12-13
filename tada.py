@@ -19,15 +19,15 @@ class Todo:
 		self.file = file
 		self.marker = marker
 		self.prefix = self.get_prefix(nl[0][1], marker)
-		if len(self.prefix) == 0:
-			# If line start ftom marker - this is a plain text format
-			# todo is oneline always
-			self.todo = [nl[0][1]]
-		else:
+		if self.prefix:
 			self.todo = list(itertools.takewhile(
 				lambda line: line.startswith(self.prefix),
 				(line[1] for line in nl)
 			))
+		else:
+			# If line start ftom marker - this is a plain text format
+			# todo is oneline always
+			self.todo = [nl[0][1]]
 		self.begin = nl[0][0]
 		self.end = self.begin + len(self.todo)
 
