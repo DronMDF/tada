@@ -101,6 +101,14 @@ class TodosTest(unittest.TestCase):
 			repo.body
 		)
 
+	def test_add_reference_to_text(self):
+		"""Issue text should contain references."""
+		todo = Todo('test.py', [(1, '@tada #15 References', True)], marker='@tada')
+		todos = Todos([todo])
+		repo = TestRepo()
+		todos.create_new({}, repo)
+		self.assertIn('Related issue: #15', repo.body)
+
 
 class FileTest(unittest.TestCase):
 	"""File parser test."""

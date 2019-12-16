@@ -39,6 +39,7 @@ class Todo:
 
 	def brief(self):
 		"""Method return issue title."""
+		# @todo #36 Remove relation from brief, if exists
 		return re.sub(r'^%s\s*%s\s+' % (self.prefix, self.marker), '', self.todo[0])
 
 	def lines(self):
@@ -54,6 +55,13 @@ class Todo:
 			)).encode('utf8')
 		).hexdigest()
 
+	def related(self):
+		"""List of related issue numbers."""
+		match = re.search(r'\s+#(\d+)\s+', self.todo[0])
+		if match:
+			return [int(match.group(1))]
+		return []
+
 
 class Todos:
 	"""TODO list class."""
@@ -67,6 +75,7 @@ class Todos:
 		for todoid, todo in self.tmap.items():
 			if todoid not in imap:
 				body = '\n'.join((
+					'Related issue: %s' % ', '.join(('#%u' % num for num in todo.related())),
 					'',
 					'```',
 					*todo.lines(),
