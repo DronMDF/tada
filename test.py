@@ -81,6 +81,22 @@ class TestRepo():
 class TodosTest(unittest.TestCase):
 	"""Test for todo list."""
 
+	def test_brief_message_is_simple_text(self):
+		"""Reference not part of brief message."""
+		todo = Todo('test.py', [(1, '@tada Brief is simple', True)], marker='@tada')
+		todos = Todos([todo])
+		repo = TestRepo()
+		todos.create_new({}, repo)
+		self.assertEqual('Brief is simple', repo.title)
+
+	def test_brief_message_not_contain_relation(self):
+		"""Reference not part of brief message."""
+		todo = Todo('test.py', [(1, '@tada #15 Brief cut', True)], marker='@tada')
+		todos = Todos([todo])
+		repo = TestRepo()
+		todos.create_new({}, repo)
+		self.assertEqual('Brief cut', repo.title)
+
 	def test_create_new(self):
 		"""New todo should be translated into issue."""
 		todo = Todo(
