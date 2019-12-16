@@ -39,8 +39,11 @@ class Todo:
 
 	def brief(self):
 		"""Method return issue title."""
-		# @todo #36 Remove relation from brief, if exists
-		return re.sub(r'^%s\s*%s\s+' % (self.prefix, self.marker), '', self.todo[0])
+		return re.sub(
+			r'^%s\s*%s\s+(#\d+\s+)?' % (self.prefix, self.marker),
+			'',
+			self.todo[0]
+		)
 
 	def lines(self):
 		"""Method return original todo lines."""
