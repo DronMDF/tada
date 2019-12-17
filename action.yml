@@ -1,5 +1,5 @@
 name: 'Tada'
-description: 'Tada action'
+description: 'Todo management system'
 inputs:
   token:
     description: 'Access token for manage issue'
